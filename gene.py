@@ -24,13 +24,13 @@ parser.add_argument('-f', '--freq_file',
         default='freq.txt')
 parser.add_argument('-m', '--max_code_length',
         help='maximum code length',
-        type=int, default=4)
+        type=int, default=2)
 parser.add_argument('-p', '--pad_with_pin_yin',
         help='add Pin-Yin for code length below the maximum',
-        type=int, default=2)
+        type=int, default=6)
 parser.add_argument('-s', '--simple_code_length',
         help='generate simple codes up to this length',
-        type=int, default=3)
+        type=int, default=0)
 parser.add_argument('-o', '--optimize',
         help='optimize for root groups, '
         'taking "all" or a comma-separated list of roots')
@@ -143,9 +143,7 @@ sp_map = {
 }
 
 def convert_py_to_sp(py):
-    if py[0] in 'a':
-        return 'a' + sp_map[py]
-    if py[0] in 'oe' or py == 'ng':
+    if py[0] in 'aoe' or py == 'ng':
         return 'o' + sp_map[py]
     if py[0] in 'zcs' and py[1] == 'h':
         return sp_map[py[0:2]] + sp_map[py[2:]]
@@ -266,10 +264,11 @@ def break_character(c):
     return roots
 
 # Remove minor (single-stroke) roots since they carry less info.
-minor_roots = ['一', '丨', '丿', '丶']
+minor_roots = ['丶']
+
 def remove_minor_roots(roots):
-    new_roots = roots[:1]
-    for root in roots[1:]:
+    new_roots = roots[:0]
+    for root in roots[0:]:
         if root not in minor_roots:
             new_roots += [root]
     return new_roots
@@ -318,10 +317,9 @@ for c in flat_dict:
         char_freq[c] = 0
 
 # Keys used for encoding roots.
-#code_keys = 'abcdefghijklmnopqrstuvwxyz;1234567890'
-code_keys = 'qwertyuiopasdfgzxcvhjkl;bnm1234567890'
+code_keys = 'hjkl;trewqgfdsxazvcyuiopbnm'
 if args.alternative_map:
-    code_keys = 'egljkaobqpzfthxsuryidvw;cnm1234567890'
+    code_keys = ';ikjwleyvgshfxdzrtuobqapcnm'
 
 # Generate the code book.
 def generate_code_book():
@@ -333,7 +331,7 @@ def generate_code_book():
             code += code_keys[root_group[root]]
         plus = pinyin[c]
         for p in plus:
-            code_plus = (code + p)[:args.max_code_length]
+            code_plus = convert_py_to_sp(p) + code
             if not code_book.has_key(code_plus):
                 code_book[code_plus] = [c]
             elif not c in code_book[code_plus]:
