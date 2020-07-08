@@ -5156,7 +5156,7 @@ sheng   EDF2 眚 生目sx
 sheng   F3CF 笙 ⺮生sx
 shi     B3D7 匙 是匕zx
 shi     CAA6 师 リ帀
-shi     CAA7 失 丿夫
+shi     CAA7 失
 shi     CAA8 狮 犭师
 shi     CAA9 施 方㐌
 shi     CAAA 湿 氵显

@@ -375,6 +375,12 @@ def generate_simple_codes():
                     simple_code_book[code] = c
                     break
 
+def has_any_prefix(code, simple_codes):
+    for simple_code in simple_codes:
+        if code.startswith(simple_code):
+            return True
+    return False
+
 # Output code book to a file.
 def output_code_book():
     with open(args.code_file, 'w') as f:
@@ -384,8 +390,9 @@ def output_code_book():
             characters = code_book[code]
             full_codes = []
             for c in characters:
-                if c not in char_simple_code:
-                    full_codes += [c]
+                if c not in char_simple_code or \
+                        not has_any_prefix(code, char_simple_code[c]):
+                            full_codes += [c]
             full_codes.sort(key=lambda c: char_freq[c], reverse=True)
             code_count = len(full_codes)
             for c in full_codes:
@@ -397,8 +404,9 @@ def count_dups():
         characters = code_book[code]
         full_codes = []
         for c in characters:
-            if c not in char_simple_code:
-                full_codes += [c]
+            if c not in char_simple_code or \
+                    not has_any_prefix(code, char_simple_code[c]):
+                        full_codes += [c]
         full_codes.sort(key=lambda c: char_freq[c], reverse=True)
         code_count = len(full_codes)
 
