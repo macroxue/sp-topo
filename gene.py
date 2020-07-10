@@ -345,41 +345,20 @@ def generate_simple_codes():
             if len(code) <= length:
                 continue
             simple_code = code[0:length]
-            if length > 1 and code_book.has_key(simple_code):
-                available = True
-                for char in code_book[simple_code]:
-                    if char not in char_simple_code:
-                        available = False
-                        break
-                if not available:
-                    continue
-            if simple_code_candidates.has_key(simple_code):
-                simple_code_candidates[simple_code] += characters
-            else:
-                simple_code_candidates[simple_code] = [] + characters
-        for code, candidates in simple_code_candidates.items():
-            candidates.sort(key=lambda c: char_freq[c], reverse=True)
-            for c in candidates:
-                if c in char_simple_code:
-                    new = True
-                    for simple_code in char_simple_code[c]:
-                        if code.startswith(simple_code):
-                            new = False
-                            break
-                    if new:
-                        char_simple_code[c] += [code]
-                        simple_code_book[code] = c
-                        break
-                else:
-                    char_simple_code[c] = [code]
-                    simple_code_book[code] = c
-                    break
-
-def has_any_prefix(code, simple_codes):
-    for simple_code in simple_codes:
-        if code.startswith(simple_code):
-            return True
-    return False
+            if code_book.has_key(simple_code):
+                continue
+            if not simple_code_candidates.has_key(simple_code):
+                simple_code_candidates[simple_code] = []
+            for character in characters:
+                simple_code_candidates[simple_code] += [(code, character)]
+        for simple_code, candidates in simple_code_candidates.items():
+            candidates.sort(key=lambda c: char_freq[c[1]], reverse=True)
+            code = candidates[0][0]
+            character = candidates[0][1]
+            simple_code_book[simple_code] = character
+            code_book[code].remove(character)
+            if len(code_book[code]) == 0:
+                del code_book[code]
 
 # Output code book to a file.
 def output_code_book():
@@ -388,41 +367,27 @@ def output_code_book():
             f.write('%4s\t%s\t1\n' % (code, simple_code_book[code]))
         for code in sorted(code_book.keys()):
             characters = code_book[code]
-            full_codes = []
+            characters.sort(key=lambda c: char_freq[c], reverse=True)
             for c in characters:
-                if c not in char_simple_code or \
-                        not has_any_prefix(code, char_simple_code[c]):
-                            full_codes += [c]
-            full_codes.sort(key=lambda c: char_freq[c], reverse=True)
-            code_count = len(full_codes)
-            for c in full_codes:
-                f.write('%4s\t%s\t%d\n' % (code, c, code_count))
+                f.write('%4s\t%s\t%d\n' % (code, c, len(characters)))
 
 def count_dups():
     num_dups = 0
     for code in sorted(code_book.keys()):
         characters = code_book[code]
-        full_codes = []
-        for c in characters:
-            if c not in char_simple_code or \
-                    not has_any_prefix(code, char_simple_code[c]):
-                        full_codes += [c]
-        full_codes.sort(key=lambda c: char_freq[c], reverse=True)
-        code_count = len(full_codes)
 
         # Don't count dups for code length 1 because many of them are
         # non-characters.
         if len(code) <= 1:
             continue
-        if code_count >= 2:
-            num_dups += code_count
+        if len(characters) >= 2:
+            num_dups += len(characters)
     return num_dups
 
 code_book = {}
 generate_code_book()
 
 simple_code_book = {}
-char_simple_code = {}
 generate_simple_codes()
 
 output_code_book()
