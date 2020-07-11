@@ -309,9 +309,12 @@ if unused_roots != []:
 with open('char_freq.txt') as f:
     lines = f.readlines()
 char_freq = {}
+char_freq_py = {}
 for line in lines:
     item = line.split()
     char_freq[item[0]] = int(item[1])
+    if len(item) >= 3:
+        char_freq_py[item[0]] = convert_py_to_sp(item[2])
 for c in flat_dict:
     if not char_freq.has_key(c):
         char_freq[c] = 0
@@ -352,7 +355,12 @@ def generate_simple_codes():
             for character in characters:
                 simple_code_candidates[simple_code] += [(code, character)]
         for simple_code, candidates in simple_code_candidates.items():
-            candidates.sort(key=lambda c: char_freq[c[1]], reverse=True)
+            # Reduce the frequency if the Pin-Yin doesn't match what's
+            # specified in the frequency table.
+            candidates.sort(key=lambda c: char_freq[c[1]]
+                    if not char_freq_py.has_key(c[1])
+                    or char_freq_py[c[1]][:2] == c[0][:2]
+                    else char_freq[c[1]] / 10, reverse=True)
             code = candidates[0][0]
             character = candidates[0][1]
             simple_code_book[simple_code] = character
