@@ -163,8 +163,9 @@ CC 串叉   如：秉乘
 1          1 尺 尸乀
 1          1 民 [民边][弋]zs
 1          1 [叚左] 尸二zs
-1          1 [良] 丶
-1          1  [艮边]丶
+1          1 [良] [良边]丶
+1          1 良 [良边][艮底]zs
+1          1 [艮] [艮边]丶
 1          1 艮 [艮边][艮底]
 # 大
 1          1 夷 大弓cd
@@ -2529,7 +2530,7 @@ ji      BCB0 及
 ji      BCB1 急 刍心SX
 ji      BCB2 疾 疒矢ZS
 ji      BCB3 汲 氵及
-ji      BCB4 即 卩
+ji      BCB4 即 [艮]卩
 ji      BCB5 嫉 女疾
 ji      BCB6 级 纟及
 ji      BCB7 挤 扌齐
@@ -2549,7 +2550,7 @@ ji      BCC4 寄 宀奇SX
 ji      BCC5 寂 宀叔SX
 ji      BCC6 计 讠十
 ji      BCC7 记 讠己
-ji      BCC8 既 旡
+ji      BCC8 既 [艮]旡
 ji      BCC9 忌 己心SX
 ji      BCCA 际 阝示
 ji      BCCB 妓 女支
@@ -3021,7 +3022,7 @@ jue     BEF0 攫 扌矍
 jue     BEF1 抉 扌夬
 jue     BEF2 掘 扌屈
 jue     BEF3 倔 亻屈
-jue     BEF4 爵 爫罒(寸)SX
+jue     BEF4 爵 爫罒([艮]寸)SX
 jue     BEF5 觉 𰃮见SX
 jue     BEF6 决 冫夬
 jue     BEF7 诀 讠夬
@@ -3487,7 +3488,7 @@ liang   C1B8 粮 米良
 liang   C1B9 凉 冫京
 liang   C1BA 梁 [梁头]木SX
 liang   C1BB 粱 [梁头]米SX
-liang   C1BC 良 丶艮SX
+liang   C1BC 良
 liang   C1BD 两
 liang   C1BE 辆 车两
 liang   C1BF 量 旦里SX
@@ -4717,7 +4718,7 @@ qing    C7E0 青 龶月SX
 qing    C7E1 轻 车𢀖
 qing    C7E2 氢 气𢀖ys
 qing    C7E3 倾 亻顷
-qing    C7E4 卿 𠂎卩
+qing    C7E4 卿 𠂎[艮]卩
 qing    C7E5 清 氵青
 qing    C7E6 擎 敬手sx
 qing    C7E7 晴 日青
