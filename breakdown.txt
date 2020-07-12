@@ -7363,7 +7363,7 @@ zhu     CAF5 术
 zhu     D6E9 珠 王朱
 zhu     D6EA 株 木朱
 zhu     D6EB 蛛 虫朱
-zhu     D6EC 朱 丿未
+zhu     D6EC 朱
 zhu     D6ED 猪 犭者
 zhu     D6EE 诸 讠者
 zhu     D6EF 诛 讠朱
