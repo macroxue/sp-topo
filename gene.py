@@ -284,7 +284,10 @@ for c in dict.keys():
     if len(roots) > args.max_code_length:
         roots = remove_minor_roots(roots)
     if len(roots) > args.max_code_length:
-        roots = roots[:args.max_code_length-1] + roots[-1:]
+       if args.max_code_length == 1:
+           roots = roots[:1]
+       else:
+           roots = roots[:args.max_code_length-1] + roots[-1:]
 
     flat_dict[c] = roots
     for root in roots:
@@ -372,12 +375,12 @@ def generate_simple_codes():
 def output_code_book():
     with open(args.code_file, 'w') as f:
         for code in sorted(simple_code_book):
-            f.write('%4s\t%s\t1\n' % (code, simple_code_book[code]))
+            f.write('%-4s\t%s\t1\n' % (code, simple_code_book[code]))
         for code in sorted(code_book.keys()):
             characters = code_book[code]
             characters.sort(key=lambda c: char_freq[c], reverse=True)
             for c in characters:
-                f.write('%4s\t%s\t%d\n' % (code, c, len(characters)))
+                f.write('%-4s\t%s\t%d\n' % (code, c, len(characters)))
 
 def count_dups():
     num_dups = 0
