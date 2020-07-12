@@ -7,21 +7,21 @@ from sys import stderr
 import argparse
 parser = argparse.ArgumentParser(
         description='Generate code book for Chinese input method')
-parser.add_argument('-a', '--alternative_map',
-        help='alternatively map groups to keys based on shape resemblance',
-        action='store_true')
 parser.add_argument('-b', '--breakdown_file',
         help='input file breaking characters down to roots',
         default='breakdown.txt')
-parser.add_argument('-g', '--group_file',
-        help='input file grouping roots',
-        default='group.txt')
 parser.add_argument('-c', '--code_file',
         help='output codes to this file',
         default='code.txt')
+parser.add_argument('-d', '--ding_gong',
+        help='starting code position to push the first-choice character on screen without pressing space bar',
+        type=int, default=0)
 parser.add_argument('-f', '--freq_file',
         help='output root frequencies to this file',
         default='freq.txt')
+parser.add_argument('-g', '--group_file',
+        help='input file grouping roots',
+        default='group.txt')
 parser.add_argument('-m', '--max_code_length',
         help='maximum code length',
         type=int, default=2)
@@ -123,7 +123,7 @@ sp_map = {
         'eng': 'f',
         'ng': 'f',
         'ing': 'g',
-        'er': 'g',
+        'er': 'f',
         'ong': 'h',
         'iong': 'h',
         'ai': 'j',
@@ -144,9 +144,12 @@ sp_map = {
 
 def convert_py_to_sp(py):
     if py[0] in 'aoe' or py == 'ng':
-        return 'o' + sp_map[py]
+        return 'j' + sp_map[py]
     if py[0] in 'zcs' and py[1] == 'h':
-        return sp_map[py[0:2]] + sp_map[py[2:]]
+        if args.ding_gong >= 2:
+            return py[0] + sp_map[py[2:]]
+        else:
+            return sp_map[py[0:2]] + sp_map[py[2:]]
     return py[0:1] + sp_map[py[1:]]
 
 lines = lines[i+1:]
@@ -324,8 +327,25 @@ for c in flat_dict:
 
 # Keys used for encoding roots.
 code_keys = 'hjkl;trewqgfdsxazvcyuiopbnm'
-if args.alternative_map:
-    code_keys = ';ikjwleyvgshfxdzrtuobqapcnm'
+
+def convert_to_ding_gong(code):
+    reduced_code = code[:args.ding_gong - 2]
+    for ch in code[args.ding_gong - 2:]:
+        if ch in 'qwert':
+            reduced_code += 'e'
+        elif ch in 'uiop':
+            reduced_code += 'i'
+        elif ch in 'y':
+            reduced_code += 'o'
+        elif ch in 'asdfg':
+            reduced_code += 'a'
+        elif ch in 'hjkl;':
+            reduced_code += ';'
+        elif ch in 'zxcv':
+            reduced_code += 'v'
+        else:
+            reduced_code += 'u'
+    return reduced_code
 
 # Generate the code book.
 def generate_code_book():
@@ -337,7 +357,10 @@ def generate_code_book():
             code += code_keys[root_group[root]]
         plus = pinyin[c]
         for p in plus:
-            code_plus = convert_py_to_sp(p) + code
+            if args.ding_gong >= 2:
+                code_plus = convert_py_to_sp(p) + convert_to_ding_gong(code)
+            else:
+                code_plus = convert_py_to_sp(p) + code
             if not code_book.has_key(code_plus):
                 code_book[code_plus] = [c]
             elif not c in code_book[code_plus]:
