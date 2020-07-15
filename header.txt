@@ -1,7 +1,0 @@
-;fcitx 版本 0x03 码表文件
-键码=abcdefghijklmnopqrstuvwxyz;
-码长=6
-规避字符=
-拼音=@
-拼音长度=12
-[数据]

@@ -141,12 +141,7 @@ sh以模糊音分别和z、c、s合并，零声母和j合并。余下的7键“a
 
     sudo apt-get install fcitx-table
 
-拷贝配置文件：
-
-    mkdir -p ~/.config/fcitx/table
-    cp ./sp-topo.conf ~/.config/fcitx/table
-
-然后运行：
+运行前一节的 ./gene.py 命令生成编码文件，然后运行如下安装脚本：
 
     ./install.sh
 
