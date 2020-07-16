@@ -137,12 +137,42 @@ sh以模糊音分别和z、c、s合并，零声母和j合并。余下的7键“a
 
 ## 安装
 
-先安装小企鹅输入法：
+### 挂接小企鹅 Fcitx
+
+安装小企鹅输入法：
 
     sudo apt-get install fcitx-table
 
-运行前一节的 ./gene.py 命令生成编码文件，然后运行如下安装脚本：
+生成编码文件:
+
+    ./gene.py -s3
+
+运行如下安装脚本在小企鹅里创建名为 “双拼拓扑形” 的输入法:
 
     ./install.sh
 
 以后每次修改或新生成编码文件后，同样运行 ./install.sh 使改动生效。
+
+### 挂接中州韵 Rime
+
+安装小企鹅输入法的 Rime 模块：
+
+    sudo apt-get install fcitx-rime
+
+生成编码文件:
+
+    ./gene.py -d2 -m4 -s5
+
+运行如下安装脚本拷贝码表到 Rime 的配置目录：
+
+    ./install_rime.sh
+
+在已有的或新建的 ~/.config/fcitx/rime/default.custom.yaml 文件中添加如下补丁：
+
+    patch:
+      schema_list:
+        - schema: double_pinyin_ding_zi
+        - schema: double_pinyin_ding
+
+重新部署 Rime 之后选择 “双拼智能＋单字顶功” 或 “单字顶功” 输入法。
+
