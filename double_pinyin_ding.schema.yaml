@@ -104,8 +104,8 @@ translator:
 zi:
   dictionary: double_pinyin_ding_zi
   initial_quality: 1
-  enable_completion: false
-  enable_user_dict: true
+  enable_completion: true
+  enable_user_dict: false
   preedit_format:
     - "xform/^/〔字〕/"
 

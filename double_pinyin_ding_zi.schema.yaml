@@ -56,7 +56,7 @@ speller:
 translator:
   dictionary: double_pinyin_ding_zi
   enable_completion: true
-  enable_user_dict: true
+  enable_user_dict: false
   db_class: tabledb
   preedit_format:
     - "xform/^/〔字〕/"
