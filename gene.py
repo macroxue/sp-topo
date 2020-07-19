@@ -359,6 +359,8 @@ def generate_code_book():
         for p in plus:
             if args.ding_gong >= 2:
                 code_plus = convert_py_to_sp(p) + convert_to_ding_gong(code)
+                while len(code_plus) < args.max_code_length + 2:
+                    code_plus += 'o'
             else:
                 code_plus = convert_py_to_sp(p) + code
             if not code_book.has_key(code_plus):
