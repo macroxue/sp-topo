@@ -386,7 +386,7 @@ def generate_simple_codes():
             candidates.sort(key=lambda c: char_freq[c[1]]
                     if not char_freq_py.has_key(c[1])
                     or char_freq_py[c[1]][:2] == c[0][:2]
-                    else char_freq[c[1]] / 10, reverse=True)
+                    else char_freq[c[1]] / 20, reverse=True)
             code = candidates[0][0]
             character = candidates[0][1]
             simple_code_book[simple_code] = character
