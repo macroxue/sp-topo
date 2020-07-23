@@ -52,8 +52,6 @@ speller:
   alphabet: abcdefghijklmnopqrstuvwxyz;
   initials: bcdfghjklmnpqrstwxyz
   delimiter: " '"
-  algebra:
-    - derive/^([a-z]{1}).+$/$1/
 
 translator:
   dictionary: double_pinyin_ding_zi
