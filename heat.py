@@ -13,14 +13,15 @@ parser.add_argument('-t', '--text_file',
 parser.add_argument('-b', '--show_bigram',
         help='show bigram table for the keys',
         action='store_true')
+parser.add_argument('-p', '--phrase_length',
+        help='allow phrases up to this length to be used',
+        type=int, default=1)
 args = parser.parse_args()
 
 with open(args.code_file) as f:
     lines = f.readlines()
 
 code_book = {}
-code_book['，'] = ','
-code_book['。'] = '.'
 for line in lines:
     line = line.strip()
     # Skip empty line or comment.
@@ -30,7 +31,21 @@ for line in lines:
     item = line.split()
     if len(item) < 2:
         continue
-    code_book[item[1]] = item[0]
+    if item[1] not in code_book or len(item[0]) < len(code_book[item[1]]):
+        code_book[item[1]] = item[0]
+
+with open('char_freq.txt') as f:
+    lines = f.readlines()[:5000]
+
+sum_freq = 0
+sum_keys = 0
+for line in lines:
+    item = line.split()
+    if item[0] in code_book.keys():
+        char_freq = int(item[1])
+        sum_freq += char_freq
+        sum_keys += len(code_book[item[0]]) * char_freq
+print '理论码长：%.2f' % (float(sum_keys) / sum_freq)
 
 with open(args.text_file) as f:
     lines = f.readlines()
@@ -43,23 +58,45 @@ left_hand_keys = 'qwertasdfgzxcvb'
 last_hand = 0  # 0=left, 1=right
 last_key = ''
 same_hand_count = 0
+missing_chars = []
+phrase_freq = {}
+punctuations = ',.，。、·‘’“”—《》【】？！；（）－：　￣…．∶°±×'
+alphanums = 'ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ'
+alphanums += 'ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ'
+alphanums += '１２３４５６７８９０'
 for line in lines:
+    chars = []
+    for c in line.decode('utf-8', 'replace'):
+        chars += [c.encode('utf-8')]
+
     i = 0
-    while i < len(line):
-        if ord(line[i]) < 128:  # ASCII character
-            if line[i] == ',' or line[i] == '.':
-                total_keys += 1
-                total_chars += 1
-                freq[line[i]] += 1
+    while i < len(chars):
+        c = chars[i]
+        if ord(c[0]) < 128 or c in punctuations or c in alphanums:
             i += 1
             continue
-        c = line[i:i+3]
-        i += 3
-        if not code_book.has_key(c):
-            continue
-        code = code_book[c]
 
-        total_chars += 1
+        if not code_book.has_key(c):
+            missing_chars += [c]
+            i += 1
+            continue
+
+        max_phrase = chars[i : i + args.phrase_length]
+        for j in range(len(max_phrase)):
+            phrase_len = len(max_phrase) - j
+            phrase = ''.join(max_phrase[:phrase_len])
+            if not code_book.has_key(phrase):
+                continue
+            if len(phrase) > 3:  # byte length of unicode
+                if phrase_freq.has_key(phrase):
+                    phrase_freq[phrase] += 1
+                else:
+                    phrase_freq[phrase] = 0
+            code = code_book[phrase]
+            i += phrase_len
+            total_chars += phrase_len
+            break
+
         for key in code:
             total_keys += 1
             if freq.has_key(key):
@@ -80,14 +117,20 @@ for line in lines:
 
 def show_freq(keys):
     for key in keys:
-        print '%c%4.1f ' % (key, freq[key]*100.0/total_keys),
+        f = freq[key] if key in freq.keys() else 0
+        print '%c%4.1f ' % (key, f*100.0/total_keys),
 
 def sum_freq(keys):
     sum = 0
     for key in keys:
-        sum += freq[key]
+        f = freq[key] if key in freq.keys() else 0
+        sum += f
     return sum*100.0 / total_keys
 
+if len(missing_chars) > 0:
+    print '缺字：', ''.join(missing_chars)
+for phrase in phrase_freq.keys():
+    print phrase, phrase_freq[phrase]
 print '字数: %d  按键: %d  每字按键: %.2f  同手连击: %.2f%%' % (
         total_chars, total_keys, float(total_keys)/total_chars,
         100.0*same_hand_count/total_keys)
@@ -98,9 +141,9 @@ print '   %4.1f=%4.1f+%4.1f' % (
 show_freq('asdfghjkl;')
 print '   %4.1f=%4.1f+%4.1f' % (
         sum_freq('asdfghjkl;'), sum_freq('asdfg'), sum_freq('hjkl;'))
-show_freq('zxcvbnm,.')
-print '          %4.1f=%4.1f+%4.1f' % (
-        sum_freq('zxcvbnm,.'), sum_freq('zxcvb'), sum_freq('nm,.'))
+show_freq('zxcvbnm,./')
+print '   %4.1f=%4.1f+%4.1f' % (
+        sum_freq('zxcvbnm,./'), sum_freq('zxcvb'), sum_freq('nm,./'))
 print
 print '%5.1f  %5.1f  %5.1f  %5.1f  %5.1f  %5.1f  %5.1f  %5.1f  %5.1f  %5.1f' % (
         sum_freq('qaz'),
@@ -108,14 +151,14 @@ print '%5.1f  %5.1f  %5.1f  %5.1f  %5.1f  %5.1f  %5.1f  %5.1f  %5.1f  %5.1f' % (
         sum_freq('edc'),
         sum_freq('rfvtgb'),
         sum_freq('qwertasdfgzxcvb'),
-        sum_freq('yuiophjkl;nm,.'),
+        sum_freq('yuiophjkl;nm,./'),
         sum_freq('yhnujm'),
         sum_freq('ik,'),
         sum_freq('ol.'),
-        sum_freq('p;'))
+        sum_freq('p;/'))
 
 if args.show_bigram:
-    keys = 'qwertasdfgzxcvbyuiophjkl;nm'
+    keys = 'qwertasdfgzxcvbyuiophjkl;nm,./'
     print
     print '  %00',
     for k2 in keys:

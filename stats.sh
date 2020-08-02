@@ -6,7 +6,7 @@ chinese_count=(〇 一 二 三 四 五 六 七 八 九 十)
 max_len=$(awk '{print length($1)}' $code_book | sort -un | tail -1)
 printf "最大码长:$max_len "
 for len in $(seq 1 $max_len); do
-  count[$len]=$(egrep "^[;a-z]{$len}[[:space:]]" $code_book | wc -l)
+  count[$len]=$(egrep "^[a-z;,./]{$len}[[:space:]]" $code_book | wc -l)
   printf "${chinese_count[$len]}码:${count[$len]}字 "
 done
 dup_groups=$(grep -v '1$' $code_book | cut -f1,3 | uniq | wc -l)
@@ -21,7 +21,7 @@ done
 echo
 
 # Per-key breakdown
-keys="; a b c d e f g h i j k l m n o p q r s t u v w x y z"
+keys="a b c d e f g h i j k l m n o p q r s t u v w x y z ; , . /"
 
 show_header() {
   echo
@@ -70,7 +70,9 @@ show_header
 for len in $(seq 1 $max_len); do
   printf "${chinese_count[$len]}码起始: "
   for key in $keys; do
-    count=$(egrep "^$key[;a-z]{$((len-1))}[[:space:]]" $code_book | wc -l)
+    pattern=$key
+    if [[ $key == '.' ]]; then pattern="\\$key"; fi
+    count=$(egrep "^$pattern[a-z;,./]{$((len-1))}[[:space:]]" $code_book | wc -l)
     row[$key]=$count
   done
   add_row
@@ -81,7 +83,9 @@ show_header
 for len in $(seq 1 $max_len); do
   printf "编码${chinese_count[$len]}位: "
   for key in $keys; do
-    count=$(egrep "^[;a-z]{$((len-1))}$key" $code_book | wc -l)
+    pattern=$key
+    if [[ $key == '.' ]]; then pattern="\\$key"; fi
+    count=$(egrep "^[a-z;,./]{$((len-1))}$pattern" $code_book | wc -l)
     row[$key]=$count
   done
   add_row
@@ -92,7 +96,9 @@ show_header
 for pos in $(seq 1 $max_len); do
   printf "重码${chinese_count[$pos]}位: "
   for key in $keys; do
-    dup_count=$(grep -v '1$' $code_book | egrep "^.{$((pos-1))}$key" | wc -l)
+    pattern=$key
+    if [[ $key == '.' ]]; then pattern="\\$key"; fi
+    dup_count=$(grep -v '1$' $code_book | egrep "^.{$((pos-1))}$pattern" | wc -l)
     row[$key]=$dup_count
   done
   add_row
