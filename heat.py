@@ -16,6 +16,9 @@ parser.add_argument('-b', '--show_bigram',
 parser.add_argument('-p', '--phrase_length',
         help='allow phrases up to this length to be used',
         type=int, default=1)
+parser.add_argument('-m', '--min_length',
+        help='minimum code length',
+        type=int, default=2)
 args = parser.parse_args()
 
 with open(args.code_file) as f:
@@ -44,7 +47,7 @@ for line in lines:
     if item[0] in code_book.keys():
         char_freq = int(item[1])
         sum_freq += char_freq
-        sum_keys += len(code_book[item[0]]) * char_freq
+        sum_keys += max(len(code_book[item[0]]), args.min_length) * char_freq
 print '理论码长：%.2f' % (float(sum_keys) / sum_freq)
 
 with open(args.text_file) as f:
@@ -91,11 +94,14 @@ for line in lines:
                 if phrase_freq.has_key(phrase):
                     phrase_freq[phrase] += 1
                 else:
-                    phrase_freq[phrase] = 0
+                    phrase_freq[phrase] = 1
             code = code_book[phrase]
             i += phrase_len
             total_chars += phrase_len
             break
+
+        while len(code) < args.min_length:
+            code += '_'
 
         for key in code:
             total_keys += 1
