@@ -40,7 +40,7 @@ parser.add_argument('-n', '--new_group_file',
 args = parser.parse_args()
 
 with open(args.breakdown_file) as f:
-  lines = f.readlines()
+    lines = f.readlines()
 
 for i in range(len(lines)):
     if lines[i].strip() == '#START':
@@ -368,6 +368,13 @@ def generate_code_book():
             elif not c in code_book[code_plus]:
                 code_book[code_plus] += [c]
 
+def get_char_py_freq(char, py):
+    freq = char_freq[char]
+    if not char_freq_py.has_key(char) or char_freq_py[char][:2] == py[:2]:
+        return freq
+    else:
+        return freq / 20
+
 # Generate simple codes based on character frequencies.
 def generate_simple_codes():
     for length in range(1, args.simple_code_length+1):
@@ -385,10 +392,7 @@ def generate_simple_codes():
         for simple_code, candidates in simple_code_candidates.items():
             # Reduce the frequency if the Pin-Yin doesn't match what's
             # specified in the frequency table.
-            candidates.sort(key=lambda c: char_freq[c[1]]
-                    if not char_freq_py.has_key(c[1])
-                    or char_freq_py[c[1]][:2] == c[0][:2]
-                    else char_freq[c[1]] / 20, reverse=True)
+            candidates.sort(key=lambda c: get_char_py_freq(c[1], c[0]), reverse=True)
             code = candidates[0][0]
             character = candidates[0][1]
             simple_code_book[simple_code] = character
